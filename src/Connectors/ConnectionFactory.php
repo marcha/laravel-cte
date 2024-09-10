@@ -31,7 +31,7 @@ class ConnectionFactory extends Base
     {
         $resolver = Connection::getResolver($driver);
 
-        if (!in_array($driver, ['singlestore', 'firebird']) && $resolver) {
+        if (!in_array($driver, ['singlestore']) && $resolver) {
             return $resolver($connection, $database, $prefix, $config); // @codeCoverageIgnore
         }
 
