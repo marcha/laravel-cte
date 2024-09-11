@@ -1,12 +1,12 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Query\Grammars\Traits;
+namespace Marcha\LaravelCte\Query\Grammars\Traits;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
-use Staudenmeir\LaravelCte\Query\Builder as CteBuilder;
-use Staudenmeir\LaravelCte\Query\FirebirdBuilder;
-use Staudenmeir\LaravelCte\Query\SingleStoreBuilder;
+use Marcha\LaravelCte\Query\Builder as CteBuilder;
+use Marcha\LaravelCte\Query\FirebirdBuilder;
+use Marcha\LaravelCte\Query\SingleStoreBuilder;
 
 trait CompilesExpressions
 {

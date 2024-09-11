@@ -1,9 +1,9 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Query\Grammars\Traits;
+namespace Marcha\LaravelCte\Query\Grammars\Traits;
 
 use Illuminate\Database\Query\Builder;
-use Staudenmeir\LaravelCte\Query\Builder as CteBuilder;
+use Marcha\LaravelCte\Query\Builder as CteBuilder;
 
 trait CompilesSQLiteExpressions
 {
@@ -22,7 +22,7 @@ trait CompilesSQLiteExpressions
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
 
-        $builderClasses = [CteBuilder::class, 'Staudenmeir\EloquentEagerLimitXLaravelCte\Query\Builder'];
+        $builderClasses = [CteBuilder::class, 'Marcha\EloquentEagerLimitXLaravelCte\Query\Builder'];
 
         for ($i = 6; $i <= 9; $i++) {
             if (in_array($backtrace[$i]['class'], $builderClasses) && $backtrace[$i]['function'] === 'withExpression') {

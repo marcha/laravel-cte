@@ -1,19 +1,19 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Query\Traits;
+namespace Marcha\LaravelCte\Query\Traits;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use RuntimeException;
-use Staudenmeir\LaravelCte\Query\Grammars\FirebirdGrammar;
-use Staudenmeir\LaravelCte\Query\Grammars\MariaDbGrammar;
-use Staudenmeir\LaravelCte\Query\Grammars\MySqlGrammar;
-use Staudenmeir\LaravelCte\Query\Grammars\OracleGrammar;
-use Staudenmeir\LaravelCte\Query\Grammars\PostgresGrammar;
-use Staudenmeir\LaravelCte\Query\Grammars\SingleStoreGrammar;
-use Staudenmeir\LaravelCte\Query\Grammars\SQLiteGrammar;
-use Staudenmeir\LaravelCte\Query\Grammars\SqlServerGrammar;
+use Marcha\LaravelCte\Query\Grammars\FirebirdGrammar;
+use Marcha\LaravelCte\Query\Grammars\MariaDbGrammar;
+use Marcha\LaravelCte\Query\Grammars\MySqlGrammar;
+use Marcha\LaravelCte\Query\Grammars\OracleGrammar;
+use Marcha\LaravelCte\Query\Grammars\PostgresGrammar;
+use Marcha\LaravelCte\Query\Grammars\SingleStoreGrammar;
+use Marcha\LaravelCte\Query\Grammars\SQLiteGrammar;
+use Marcha\LaravelCte\Query\Grammars\SqlServerGrammar;
 
 trait BuildsExpressionQueries
 {

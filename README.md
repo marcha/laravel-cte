@@ -1,12 +1,5 @@
 # Laravel CTE
 
-[![CI](https://github.com/staudenmeir/laravel-cte/actions/workflows/ci.yml/badge.svg)](https://github.com/staudenmeir/laravel-cte/actions/workflows/ci.yml)
-[![Code Coverage](https://codecov.io/gh/staudenmeir/laravel-cte/graph/badge.svg?token=JWHOOEYYGG)](https://codecov.io/gh/staudenmeir/laravel-cte)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/staudenmeir/laravel-cte/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/staudenmeir/laravel-cte/?branch=main)
-[![Latest Stable Version](https://poser.pugx.org/staudenmeir/laravel-cte/v/stable)](https://packagist.org/packages/staudenmeir/laravel-cte)
-[![Total Downloads](https://poser.pugx.org/staudenmeir/laravel-cte/downloads)](https://packagist.org/packages/staudenmeir/laravel-cte/stats)
-[![License](https://poser.pugx.org/staudenmeir/laravel-cte/license)](https://github.com/staudenmeir/laravel-cte/blob/main/LICENSE)
-
 This Laravel extension adds support for common table expressions (CTE) to the query builder and Eloquent.
 
 Supports Laravel 5.5+.
@@ -24,11 +17,11 @@ Supports Laravel 5.5+.
 
 ## Installation
 
-    composer require staudenmeir/laravel-cte:"^1.0"
+    composer require marcha/laravel-cte:"^1.0"
 
 Use this command if you are in PowerShell on Windows (e.g. in VS Code):
 
-    composer require staudenmeir/laravel-cte:"^^^^1.0"
+    composer require marcha/laravel-cte:"^^^^1.0"
 
 ## Versions
 
@@ -179,7 +172,7 @@ In Laravel 5.5–5.7, this requires the `QueriesExpressions` trait:
 ```php
 class User extends Model
 {
-    use \Staudenmeir\LaravelCte\Eloquent\QueriesExpressions;
+    use \Marcha\LaravelCte\Eloquent\QueriesExpressions;
 }
 
 $query = User::whereNull('parent_id')
@@ -203,7 +196,7 @@ package: [staudenmeir/laravel-adjacency-list](https://github.com/staudenmeir/lar
 If you are using Lumen, you have to instantiate the query builder manually:
 
 ```php
-$builder = new \Staudenmeir\LaravelCte\Query\Builder(app('db')->connection());
+$builder = new \Marcha\LaravelCte\Query\Builder(app('db')->connection());
 
 $result = $builder->from(...)->withExpression(...)->get();
 ```

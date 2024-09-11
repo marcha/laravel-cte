@@ -1,11 +1,11 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Tests;
+namespace Marcha\LaravelCte\Tests;
 
 use DateTime;
 use Illuminate\Database\Query\Expression;
-use Staudenmeir\LaravelCte\Tests\Models\Post;
-use Staudenmeir\LaravelCte\Tests\Models\User;
+use Marcha\LaravelCte\Tests\Models\Post;
+use Marcha\LaravelCte\Tests\Models\User;
 
 class EloquentTest extends TestCase
 {

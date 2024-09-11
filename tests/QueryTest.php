@@ -1,11 +1,11 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Tests;
+namespace Marcha\LaravelCte\Tests;
 
 use DateTime;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Support\Facades\DB;
-use Staudenmeir\LaravelCte\DatabaseServiceProvider;
+use Marcha\LaravelCte\DatabaseServiceProvider;
 
 class QueryTest extends TestCase
 {

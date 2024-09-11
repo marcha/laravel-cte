@@ -1,6 +1,6 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Connections;
+namespace Marcha\LaravelCte\Connections;
 
 use Illuminate\Database\MariaDbConnection as Base;
 

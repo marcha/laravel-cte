@@ -1,8 +1,8 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Connections;
+namespace Marcha\LaravelCte\Connections;
 
-use Staudenmeir\LaravelCte\Query\Builder;
+use Marcha\LaravelCte\Query\Builder;
 
 trait CreatesQueryBuilder
 {

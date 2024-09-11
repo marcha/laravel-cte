@@ -1,6 +1,6 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Tests;
+namespace Marcha\LaravelCte\Tests;
 
 use HarryGulliford\Firebird\FirebirdServiceProvider;
 use Illuminate\Database\Eloquent\Model;
@@ -8,8 +8,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as Base;
-use Staudenmeir\LaravelCte\Tests\Models\Post;
-use Staudenmeir\LaravelCte\Tests\Models\User;
+use Marcha\LaravelCte\Tests\Models\Post;
+use Marcha\LaravelCte\Tests\Models\User;
 use SingleStore\Laravel\SingleStoreProvider;
 use Yajra\Oci8\Oci8ServiceProvider;
 

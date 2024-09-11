@@ -1,9 +1,9 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Query\Grammars;
+namespace Marcha\LaravelCte\Query\Grammars;
 
 use SingleStore\Laravel\Query\Grammar;
-use Staudenmeir\LaravelCte\Query\Grammars\Traits\CompilesMySqlExpressions;
+use Marcha\LaravelCte\Query\Grammars\Traits\CompilesMySqlExpressions;
 
 class SingleStoreGrammar extends Grammar
 {

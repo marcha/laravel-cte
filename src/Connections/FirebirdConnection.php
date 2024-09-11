@@ -1,8 +1,8 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Connections;
+namespace Marcha\LaravelCte\Connections;
 
-use Staudenmeir\LaravelCte\Query\FirebirdBuilder;
+use Marcha\LaravelCte\Query\FirebirdBuilder;
 use HarryGulliford\Firebird\FirebirdConnection as Base;
 
 class FirebirdConnection extends Base

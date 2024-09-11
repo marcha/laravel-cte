@@ -1,5 +1,5 @@
 {
-    "name": "staudenmeir/laravel-cte",
+    "name": "marcha/laravel-cte",
     "description": "Laravel queries with common table expressions",
     "license": "MIT",
     "authors": [
@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Staudenmeir\\LaravelCte\\": "src/"
+            "Marcha\\LaravelCte\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Staudenmeir\\LaravelCte\\Tests\\": "tests/"
+            "Marcha\\LaravelCte\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -37,7 +37,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Staudenmeir\\LaravelCte\\DatabaseServiceProvider"
+                "Marcha\\LaravelCte\\DatabaseServiceProvider"
             ]
         }
     },

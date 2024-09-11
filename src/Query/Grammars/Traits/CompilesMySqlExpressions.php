@@ -1,6 +1,6 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Query\Grammars\Traits;
+namespace Marcha\LaravelCte\Query\Grammars\Traits;
 
 use Illuminate\Database\Query\Builder;
 

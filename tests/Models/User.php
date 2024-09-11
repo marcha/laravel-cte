@@ -1,9 +1,9 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Tests\Models;
+namespace Marcha\LaravelCte\Tests\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Staudenmeir\LaravelCte\Eloquent\QueriesExpressions;
+use Marcha\LaravelCte\Eloquent\QueriesExpressions;
 
 class User extends Model
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Query;
+namespace Marcha\LaravelCte\Query;
 
 use SingleStore\Laravel\Query\Builder;
-use Staudenmeir\LaravelCte\Query\Traits\BuildsExpressionQueries;
+use Marcha\LaravelCte\Query\Traits\BuildsExpressionQueries;
 
 class SingleStoreBuilder extends Builder
 {

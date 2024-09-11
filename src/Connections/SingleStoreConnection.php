@@ -1,9 +1,9 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Connections;
+namespace Marcha\LaravelCte\Connections;
 
 use SingleStore\Laravel\Connect\Connection;
-use Staudenmeir\LaravelCte\Query\SingleStoreBuilder;
+use Marcha\LaravelCte\Query\SingleStoreBuilder;
 
 class SingleStoreConnection extends Connection
 {

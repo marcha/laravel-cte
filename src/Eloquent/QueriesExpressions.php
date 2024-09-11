@@ -1,18 +1,18 @@
 <?php
 
-namespace Staudenmeir\LaravelCte\Eloquent;
+namespace Marcha\LaravelCte\Eloquent;
 
-use Staudenmeir\LaravelCte\Query\Builder;
-use Staudenmeir\LaravelCte\Query\FirebirdBuilder;
-use Staudenmeir\LaravelCte\Query\OracleBuilder;
-use Staudenmeir\LaravelCte\Query\SingleStoreBuilder;
+use Marcha\LaravelCte\Query\Builder;
+use Marcha\LaravelCte\Query\FirebirdBuilder;
+use Marcha\LaravelCte\Query\OracleBuilder;
+use Marcha\LaravelCte\Query\SingleStoreBuilder;
 
 trait QueriesExpressions
 {
     /**
      * Get a new query builder instance for the connection.
      *
-     * @return \Staudenmeir\LaravelCte\Query\Builder
+     * @return \Marcha\LaravelCte\Query\Builder
      */
     protected function newBaseQueryBuilder()
     {
