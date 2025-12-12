@@ -2,6 +2,7 @@
 
 namespace Marcha\LaravelCte\Query\Grammars\Traits;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
 use Marcha\LaravelCte\Query\Builder as CteBuilder;
@@ -12,9 +13,13 @@ trait CompilesExpressions
 {
     /**
      * Create a new grammar instance.
+     *
+     * @param \Illuminate\Database\Connection $connection
      */
-    public function __construct()
+    public function __construct(Connection $connection)
     {
+        parent::__construct($connection);
+
         array_unshift($this->selectComponents, 'expressions');
 
         $this->selectComponents[] = 'recursionLimit';
@@ -24,7 +29,9 @@ trait CompilesExpressions
      * Compile the common table expressions.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $expressions
+     * @param list<array{name: string, query: string, columns: list<string|\Illuminate\Database\Query\Expression<*>>|null,
+     *        recursive: bool, materialized: bool|null,
+     *        cycle: array{columns: list<string>, markColumn: string, pathColumn: string}|null}> $expressions
      * @return string
      */
     public function compileExpressions(Builder $query, array $expressions)
@@ -55,7 +62,9 @@ trait CompilesExpressions
     /**
      * Get the "recursive" keyword.
      *
-     * @param array $expressions
+     * @param list<array{name: string, query: string, columns: list<string|\Illuminate\Database\Query\Expression<*>>|null,
+     *        recursive: bool, materialized: bool|null,
+     *        cycle: array{columns: list<string>, markColumn: string, pathColumn: string}|null}> $expressions
      * @return string
      */
     protected function recursiveKeyword(array $expressions)
@@ -83,7 +92,9 @@ trait CompilesExpressions
      * Compile the cycle detection.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $expression
+     * @param array{name: string, query: string, columns: list<string|\Illuminate\Database\Query\Expression<*>>|null,
+     *        recursive: bool, materialized: bool|null,
+     *        cycle: array{columns: list<string>, markColumn: string, pathColumn: string}|null} $expression
      * @return string
      */
     public function compileCycle(Builder $query, array $expression)
@@ -126,12 +137,14 @@ trait CompilesExpressions
      * Compile an insert statement using a subquery into SQL.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $columns
+     * @param list<string|\Illuminate\Database\Query\Expression<*>> $columns
      * @param string $sql
      * @return string
      */
     public function compileInsertUsing(Builder $query, array $columns, string $sql)
     {
+        /** @var \Marcha\LaravelCte\Query\Builder $query */
+
         $expressions = $this->compileExpressions($query, $query->expressions);
 
         $recursionLimit = $this->compileRecursionLimit($query, $query->recursionLimit);
@@ -148,11 +161,13 @@ trait CompilesExpressions
      * Compile an update statement into SQL.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $values
+     * @param array<string, mixed> $values
      * @return string
      */
     public function compileUpdate(Builder $query, array $values)
     {
+        /** @var \Marcha\LaravelCte\Query\Builder $query */
+
         $compiled = parent::compileUpdate($query, $values);
 
         return (string) Str::of($compiled)
@@ -163,9 +178,11 @@ trait CompilesExpressions
     /**
      * Prepare the bindings for an update statement.
      *
-     * @param array $bindings
-     * @param array $values
-     * @return array
+     * @param array{expressions: list<mixed>, select: list<mixed>, from: list<mixed>, join: list<mixed>,
+     *     where: list<mixed>, having: list<mixed>, order: list<mixed>, union: list<mixed>,
+     *     unionOrder: list<mixed>} $bindings
+     * @param array<string, mixed> $values
+     * @return array<int, mixed>
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
@@ -173,16 +190,21 @@ trait CompilesExpressions
 
         unset($bindings['expressions']);
 
-        return parent::prepareBindingsForUpdate($bindings, $values);
+        /** @var array<int, mixed> $bindings */
+        $bindings = parent::prepareBindingsForUpdate($bindings, $values);
+
+        return $bindings;
     }
 
     /**
      * Get the bindings for an update statement.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $bindings
-     * @param array $values
-     * @return array
+     * @param array{expressions: list<mixed>, select: list<mixed>, from: list<mixed>, join: list<mixed>,
+     *      where: list<mixed>, having: list<mixed>, order: list<mixed>, union: list<mixed>,
+     *      unionOrder: list<mixed>} $bindings
+     * @param array<string, mixed> $values
+     * @return array<int, mixed>
      */
     public function getBindingsForUpdate(Builder $query, array $bindings, array $values)
     {
@@ -197,6 +219,8 @@ trait CompilesExpressions
      */
     public function compileDelete(Builder $query)
     {
+        /** @var \Marcha\LaravelCte\Query\Builder $query */
+
         $compiled = parent::compileDelete($query);
 
         return (string) Str::of($compiled)

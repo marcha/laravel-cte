@@ -2,19 +2,16 @@
 
 namespace Marcha\LaravelCte;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
 use Marcha\LaravelCte\Connectors\ConnectionFactory;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
+    /** @inheritDoc */
     public function register()
     {
-        $this->app->singleton('db.factory', function ($app) {
+        $this->app->singleton('db.factory', function (Container $app) {
             return new ConnectionFactory($app);
         });
     }

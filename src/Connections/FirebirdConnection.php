@@ -3,7 +3,7 @@
 namespace Marcha\LaravelCte\Connections;
 
 use Marcha\LaravelCte\Query\FirebirdBuilder;
-use HarryGulliford\Firebird\FirebirdConnection as Base;
+use Marcha\Firebird\Connection as Base;
 
 class FirebirdConnection extends Base
 {

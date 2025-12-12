@@ -6,12 +6,16 @@ use Illuminate\Database\Query\Builder;
 
 trait CompilesOracleExpressions
 {
-    use CompilesExpressions;
+    use CompilesExpressions {
+        compileSelect as compileSelectTrait;
+    }
 
     /**
      * Get the "recursive" keyword.
      *
-     * @param array $expressions
+     * @param list<array{name: string, query: string, columns: list<string|\Illuminate\Database\Query\Expression<*>>|null,
+     *        recursive: bool, materialized: bool|null,
+     *        cycle: array{columns: list<string>, markColumn: string, pathColumn: string}|null}> $expressions
      * @return string
      */
     protected function recursiveKeyword(array $expressions)
@@ -19,16 +23,24 @@ trait CompilesOracleExpressions
         return '';
     }
 
+    /** @inheritDoc */
+    public function compileSelect(Builder $query): string
+    {
+        return $this->compileSelectTrait($query);
+    }
+
     /**
      * Compile an insert statement using a subquery into SQL.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $columns
+     * @param list<string|\Illuminate\Database\Query\Expression<*>> $columns
      * @param string $sql
      * @return string
      */
     public function compileInsertUsing(Builder $query, array $columns, string $sql)
     {
+        /** @var \Marcha\LaravelCte\Query\OracleBuilder $query */
+
         $insert = "insert into {$this->wrapTable($query->from)} ({$this->columnize($columns)}) ";
 
         return "$insert{$this->compileExpressions($query, $query->expressions)} $sql";

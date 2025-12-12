@@ -15,17 +15,18 @@ trait CompilesSQLiteExpressions
     /**
      * Compile a single union statement.
      *
-     * @param array $union
+     * @param array{query: \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>, all: bool} $union
      * @return string
      */
     protected function compileUnion(array $union)
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
 
-        $builderClasses = [CteBuilder::class, 'Marcha\EloquentEagerLimitXLaravelCte\Query\Builder'];
+        $builderClasses = [CteBuilder::class, 'Staudenmeir\EloquentEagerLimitXLaravelCte\Query\Builder'];
 
         for ($i = 6; $i <= 9; $i++) {
-            if (in_array($backtrace[$i]['class'], $builderClasses) && $backtrace[$i]['function'] === 'withExpression') {
+            if (isset($backtrace[$i]['class']) && in_array($backtrace[$i]['class'], $builderClasses)
+                && $backtrace[$i]['function'] === 'withExpression') {
                 $conjunction = $union['all'] ? ' union all ' : ' union ';
 
                 return $conjunction.$union['query']->toSql();
@@ -39,12 +40,12 @@ trait CompilesSQLiteExpressions
      * Compile an update statement into SQL.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $values
+     * @param array<string, mixed> $values
      * @return string
      */
     public function compileUpdate(Builder $query, array $values)
     {
-        if (isset($query->joins) || isset($query->limit)) {
+        if ($query->joins || isset($query->limit)) {
             return parent::compileUpdate($query, $values);
         }
 
@@ -55,28 +56,31 @@ trait CompilesSQLiteExpressions
      * Get the bindings for an update statement.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @param array $bindings
-     * @param array $values
-     * @return array
+     * @param array{expressions: list<mixed>, select: list<mixed>, from: list<mixed>, join: list<mixed>,
+     *      where: list<mixed>, having: list<mixed>, order: list<mixed>, union: list<mixed>,
+     *      unionOrder: list<mixed>} $bindings
+     * @param array<string, mixed> $values
+     * @return array<int, mixed>
      */
     public function getBindingsForUpdate(Builder $query, array $bindings, array $values)
     {
-        if (isset($query->joins) || isset($query->limit)) {
-            return parent::prepareBindingsForUpdate($bindings, $values);
+        if ($query->joins || isset($query->limit)) {
+            /** @var array<int, mixed> $bindings */
+            $bindings = parent::prepareBindingsForUpdate($bindings, $values);
+
+            return $bindings;
         }
 
-        return $this->prepareBindingsForUpdate($bindings, $values);
+        /** @var array<int, mixed> $bindings */
+        $bindings = $this->prepareBindingsForUpdate($bindings, $values);
+
+        return $bindings;
     }
 
-    /**
-     * Compile a delete statement into SQL.
-     *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @return string
-     */
+    /** @inheritDoc */
     public function compileDelete(Builder $query)
     {
-        if (isset($query->joins) || isset($query->limit)) {
+        if ($query->joins || isset($query->limit)) {
             return parent::compileDelete($query);
         }
 

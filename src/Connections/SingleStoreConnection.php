@@ -2,16 +2,12 @@
 
 namespace Marcha\LaravelCte\Connections;
 
-use SingleStore\Laravel\Connect\Connection;
+use SingleStore\Laravel\Connect\Connection as Base;
 use Marcha\LaravelCte\Query\SingleStoreBuilder;
 
-class SingleStoreConnection extends Connection
+class SingleStoreConnection extends Base
 {
-    /**
-     * Get a new query builder instance.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
+    /** @inheritDoc */
     public function query()
     {
         return new SingleStoreBuilder($this);

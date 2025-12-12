@@ -18,30 +18,47 @@ use Marcha\LaravelCte\Query\Grammars\SqlServerGrammar;
 trait BuildsExpressionQueries
 {
     /**
+     * The Laravel native query grammars.
+     *
+     * @var list<class-string<\Illuminate\Database\Query\Grammars\Grammar>>
+     */
+    public const NATIVE_GRAMMARS = [
+        \Illuminate\Database\Query\Grammars\MySqlGrammar::class,
+        \Illuminate\Database\Query\Grammars\MariaDbGrammar::class,
+        \Illuminate\Database\Query\Grammars\PostgresGrammar::class,
+        \Illuminate\Database\Query\Grammars\SQLiteGrammar::class,
+        \Illuminate\Database\Query\Grammars\SqlServerGrammar::class,
+    ];
+
+    /**
      * The common table expressions.
      *
-     * @var array
+     * @var list<array{name: string, query: string, columns: list<string|\Illuminate\Database\Query\Expression<*>>|null,
+     *       recursive: bool, materialized: bool|null,
+     *       cycle: array{columns: list<string>, markColumn: string, pathColumn: string}|null}>
      */
     public $expressions = [];
 
     /**
      * The common table expressions for union queries.
      *
-     * @var array
+     * @var list<array{name: string, query: string, columns: list<string|\Illuminate\Database\Query\Expression<*>>|null,
+     *        recursive: bool, materialized: bool|null,
+     *        cycle: array{columns: list<string>, markColumn: string, pathColumn: string}|null}>
      */
     public $unionExpressions = [];
 
     /**
      * The recursion limit.
      *
-     * @var int
+     * @var int|null
      */
     public $recursionLimit;
 
     /**
      * The recursion limit for union queries.
      *
-     * @var int
+     * @var int|null
      */
     public $unionRecursionLimit;
 
@@ -55,7 +72,11 @@ trait BuildsExpressionQueries
      */
     public function __construct(Connection $connection, ?Grammar $grammar = null, ?Processor $processor = null)
     {
-        $grammar = $grammar ?: $connection->withTablePrefix($this->getQueryGrammar($connection));
+        // Override the provided grammar if it is null or a native grammar
+        if (is_null($grammar) || in_array($grammar::class, self::NATIVE_GRAMMARS)) {
+            $grammar = $this->getQueryGrammar($connection);
+        }
+
         $processor = $processor ?: $connection->getPostProcessor();
 
         parent::__construct($connection, $grammar, $processor);
@@ -73,37 +94,46 @@ trait BuildsExpressionQueries
     {
         $driver = $connection->getDriverName();
 
-        $grammar = match ($driver) {
-            'mysql' => new MySqlGrammar(),
-            'mariadb' => new MariaDbGrammar(),
-            'pgsql' => new PostgresGrammar(),
-            'sqlite' => new SQLiteGrammar(),
-            'sqlsrv' => new SqlServerGrammar(),
-            'oracle' => new OracleGrammar(),
-            'singlestore' => new SingleStoreGrammar(),
-            'firebird' => new FirebirdGrammar(),
+        return match ($driver) {
+            'mysql' => new MySqlGrammar($connection),
+            'mariadb' => new MariaDbGrammar($connection),
+            'pgsql' => new PostgresGrammar($connection),
+            'sqlite' => new SQLiteGrammar($connection),
+            'sqlsrv' => new SqlServerGrammar($connection),
+            'oracle' => new OracleGrammar($connection),
+            'singlestore' => new SingleStoreGrammar(
+                connection: $connection,
+                ignoreOrderByInDeletes: $connection->getConfig('ignore_order_by_in_deletes'),
+                ignoreOrderByInUpdates: $connection->getConfig('ignore_order_by_in_updates')
+            ),
+            'firebird' => new FirebirdGrammar($connection),
             default => throw new RuntimeException('This database is not supported.'), // @codeCoverageIgnore
         };
-
-        return $grammar->setConnection($connection);
     }
 
     /**
      * Add a common table expression to the query.
      *
      * @param string $name
-     * @param \Closure|\Illuminate\Database\Query\Builder|string $query
-     * @param array|null $columns
+     * @param string|\Closure|\Illuminate\Database\Query\Builder $query
+     * @param list<string|\Illuminate\Database\Query\Expression<*>>|null $columns
      * @param bool $recursive
      * @param bool|null $materialized
-     * @param array|null $cycle
+     * @param array{columns: list<string>, markColumn: string, pathColumn: string}|null $cycle
      * @return $this
      */
     public function withExpression($name, $query, ?array $columns = null, $recursive = false, $materialized = null, ?array $cycle = null)
     {
+        /** @var string $query */
         [$query, $bindings] = $this->createSub($query);
 
-        $this->{$this->unions ? 'unionExpressions' : 'expressions'}[] = compact('name', 'query', 'columns', 'recursive', 'materialized', 'cycle');
+        $expression = compact('name', 'query', 'columns', 'recursive', 'materialized', 'cycle');
+
+        if ($this->unions) {
+            $this->unionExpressions[] = $expression;
+        } else {
+            $this->expressions[] = $expression;
+        }
 
         $this->addBinding($bindings, 'expressions');
 
@@ -114,9 +144,9 @@ trait BuildsExpressionQueries
      * Add a recursive common table expression to the query.
      *
      * @param string $name
-     * @param \Closure|\Illuminate\Database\Query\Builder|string $query
-     * @param array|null $columns
-     * @param array|null $cycle
+     * @param string|\Closure|\Illuminate\Database\Query\Builder $query
+     * @param list<string|\Illuminate\Database\Query\Expression<*>>|null $columns
+     * @param array{columns: list<string>, markColumn: string, pathColumn: string}|null $cycle
      * @return $this
      */
     public function withRecursiveExpression($name, $query, $columns = null, ?array $cycle = null)
@@ -128,11 +158,11 @@ trait BuildsExpressionQueries
      * Add a recursive common table expression with cycle detection to the query.
      *
      * @param string $name
-     * @param \Closure|\Illuminate\Database\Query\Builder|string $query
-     * @param array|string $cycleColumns
+     * @param string|\Closure|\Illuminate\Database\Query\Builder $query
+     * @param list<string>|string $cycleColumns
      * @param string $markColumn
      * @param string $pathColumn
-     * @param array|null $columns
+     * @param list<string|\Illuminate\Database\Query\Expression<*>>|null $columns
      * @return $this
      */
     public function withRecursiveExpressionAndCycleDetection($name, $query, $cycleColumns, $markColumn = 'is_cycle', $pathColumn = 'path', $columns = null)
@@ -150,8 +180,8 @@ trait BuildsExpressionQueries
      * Add a materialized common table expression to the query.
      *
      * @param string $name
-     * @param \Closure|\Illuminate\Database\Query\Builder|string $query
-     * @param array|null $columns
+     * @param string|\Closure|\Illuminate\Database\Query\Builder $query
+     * @param list<string|\Illuminate\Database\Query\Expression<*>>|null $columns
      * @return $this
      */
     public function withMaterializedExpression($name, $query, $columns = null)
@@ -163,8 +193,8 @@ trait BuildsExpressionQueries
      * Add a non-materialized common table expression to the query.
      *
      * @param string $name
-     * @param \Closure|\Illuminate\Database\Query\Builder|string $query
-     * @param array|null $columns
+     * @param string|\Closure|\Illuminate\Database\Query\Builder $query
+     * @param list<string|\Illuminate\Database\Query\Expression<*>>|null $columns
      * @return $this
      */
     public function withNonMaterializedExpression($name, $query, $columns = null)
@@ -188,17 +218,22 @@ trait BuildsExpressionQueries
     /**
      * Insert new records into the table using a subquery.
      *
-     * @param array $columns
-     * @param \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param list<string|\Illuminate\Database\Query\Expression<*>> $columns
+     * @param string|\Closure|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Database\Query\Builder $query
      * @return int
      */
     public function insertUsing(array $columns, $query)
     {
         $this->applyBeforeQueryCallbacks();
 
+        /** @var array<int, mixed> $expressionBindings */
+        $expressionBindings = $this->bindings['expressions'];
+
+        /** @var string $sql */
+        /** @var array<int, mixed> $bindings */
         [$sql, $bindings] = $this->createSub($query);
 
-        $bindings = array_merge($this->bindings['expressions'], $bindings);
+        $bindings = array_merge($expressionBindings, $bindings);
 
         return $this->connection->affectingStatement(
             $this->grammar->compileInsertUsing($this, $columns, $sql),
@@ -209,34 +244,45 @@ trait BuildsExpressionQueries
     /**
      * Update records in the database.
      *
-     * @param array $values
+     * @param array<string, mixed> $values
      * @return int
      */
     public function update(array $values)
     {
         $this->applyBeforeQueryCallbacks();
 
-        $sql = $this->grammar->compileUpdate($this, $values);
+        /** @var \Marcha\LaravelCte\Query\Grammars\ExpressionGrammar $grammar */
+        $grammar = $this->grammar;
+
+        $sql = $grammar->compileUpdate($this, $values);
+
+        /** @var array{expressions: list<mixed>, select: list<mixed>, from: list<mixed>, join: list<mixed>,
+         * where: list<mixed>, having: list<mixed>, order: list<mixed>, union: list<mixed>,
+         * unionOrder: list<mixed>} $bindings */
+        $bindings = $this->bindings;
 
         return $this->connection->update($sql, $this->cleanBindings(
-            $this->grammar->getBindingsForUpdate($this, $this->bindings, $values)
+            $grammar->getBindingsForUpdate($this, $bindings, $values)
         ));
     }
 
     /**
      * Update records in a PostgreSQL database using the update from syntax.
      *
-     * @param array $values
+     * @param array<string, mixed> $values
      * @return int
      */
     public function updateFrom(array $values)
     {
         $this->applyBeforeQueryCallbacks();
 
-        $sql = $this->grammar->compileUpdateFrom($this, $values);
+        /** @var \Illuminate\Database\Query\Grammars\PostgresGrammar $grammar */
+        $grammar = $this->grammar;
+
+        $sql = $grammar->compileUpdateFrom($this, $values);
 
         return $this->connection->update($sql, $this->cleanBindings(
-            $this->grammar->prepareBindingsForUpdateFrom($this->bindings, $values)
+            $grammar->prepareBindingsForUpdateFrom($this->bindings, $values)
         ));
     }
 }
